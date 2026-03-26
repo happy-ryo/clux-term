@@ -8,7 +8,7 @@ echo "==> Running cargo +nightly fmt --check..."
 cargo +nightly fmt --all -- --check
 
 echo "==> Running cargo clippy..."
-cargo clippy --all-targets -- -D warnings
+cargo clippy --workspace --all-targets -- -D warnings
 
 echo "==> Running cargo build..."
 cargo build
