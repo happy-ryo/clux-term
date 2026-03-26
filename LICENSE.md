@@ -1,6 +1,16 @@
-MIT License
+# clux
 
-Copyright (c) 2018-Present Wez Furlong
+clux is a fork of [WezTerm](https://github.com/wezterm/wezterm),
+a GPU-accelerated terminal emulator by Wez Furlong.
+
+## clux additions
+Copyright 2024-Present happy-ryo
+Licensed under the MIT License.
+
+## Original WezTerm License
+Copyright 2018-Present Wez Furlong
+
+MIT License
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +29,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+## Bundled Font Licenses
 
 WezTerm bundles `JetBrains Mono`, `Noto Color Emoji` and `Roboto` fonts.
 Those are distributed under the terms of the OFL 1.1, the text of which
