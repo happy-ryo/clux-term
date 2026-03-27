@@ -42,17 +42,17 @@ jobs:
         shell: cmd
         run: |
           PATH C:\Strawberry\perl\bin;%PATH%
-          cargo build -p wezterm --release
+          cargo build -p clux --release
       - name: "Build wezterm-gui (Release mode)"
         shell: cmd
         run: |
           PATH C:\Strawberry\perl\bin;%PATH%
-          cargo build -p wezterm-gui --release
+          cargo build -p clux-gui --release
       - name: "Build wezterm-mux-server (Release mode)"
         shell: cmd
         run: |
           PATH C:\Strawberry\perl\bin;%PATH%
-          cargo build -p wezterm-mux-server --release
+          cargo build -p clux-mux-server --release
       - name: "Build strip-ansi-escapes (Release mode)"
         shell: cmd
         run: |

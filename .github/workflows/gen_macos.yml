@@ -58,22 +58,22 @@ jobs:
         run: "env CI=yes PATH=$PATH ./get-deps"
       - name: "Build wezterm (Release mode Intel)"
         shell: bash
-        run: "cargo build --target x86_64-apple-darwin -p wezterm --release"
+        run: "cargo build --target x86_64-apple-darwin -p clux --release"
       - name: "Build wezterm (Release mode ARM)"
         shell: bash
-        run: "cargo build --target aarch64-apple-darwin -p wezterm --release"
+        run: "cargo build --target aarch64-apple-darwin -p clux --release"
       - name: "Build wezterm-gui (Release mode Intel)"
         shell: bash
-        run: "cargo build --target x86_64-apple-darwin -p wezterm-gui --release"
+        run: "cargo build --target x86_64-apple-darwin -p clux-gui --release"
       - name: "Build wezterm-gui (Release mode ARM)"
         shell: bash
-        run: "cargo build --target aarch64-apple-darwin -p wezterm-gui --release"
+        run: "cargo build --target aarch64-apple-darwin -p clux-gui --release"
       - name: "Build wezterm-mux-server (Release mode Intel)"
         shell: bash
-        run: "cargo build --target x86_64-apple-darwin -p wezterm-mux-server --release"
+        run: "cargo build --target x86_64-apple-darwin -p clux-mux-server --release"
       - name: "Build wezterm-mux-server (Release mode ARM)"
         shell: bash
-        run: "cargo build --target aarch64-apple-darwin -p wezterm-mux-server --release"
+        run: "cargo build --target aarch64-apple-darwin -p clux-mux-server --release"
       - name: "Build strip-ansi-escapes (Release mode Intel)"
         shell: bash
         run: "cargo build --target x86_64-apple-darwin -p strip-ansi-escapes --release"
