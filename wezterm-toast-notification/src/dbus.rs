@@ -104,7 +104,7 @@ async fn show_notif_impl(notif: ToastNotification) -> Result<(), Box<dyn std::er
     hints.insert("urgency", Value::U8(2 /* Critical */));
     let notification = proxy
         .notify(
-            "wezterm",
+            "clux",
             0,
             "org.wezfurlong.wezterm",
             &notif.title,

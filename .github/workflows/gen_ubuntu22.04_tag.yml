@@ -64,13 +64,13 @@ jobs:
         run: "env CI=yes PATH=$PATH ./get-deps"
       - name: "Build wezterm (Release mode)"
         shell: bash
-        run: "cargo build -p wezterm --release"
+        run: "cargo build -p clux --release"
       - name: "Build wezterm-gui (Release mode)"
         shell: bash
-        run: "cargo build -p wezterm-gui --release"
+        run: "cargo build -p clux-gui --release"
       - name: "Build wezterm-mux-server (Release mode)"
         shell: bash
-        run: "cargo build -p wezterm-mux-server --release"
+        run: "cargo build -p clux-mux-server --release"
       - name: "Build strip-ansi-escapes (Release mode)"
         shell: bash
         run: "cargo build -p strip-ansi-escapes --release"

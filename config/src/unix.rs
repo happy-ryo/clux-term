@@ -119,9 +119,9 @@ impl UnixDomain {
             None => Ok(vec![
                 std::env::current_exe()?
                     .with_file_name(if cfg!(windows) {
-                        "wezterm-mux-server.exe"
+                        "clux-mux-server.exe"
                     } else {
-                        "wezterm-mux-server"
+                        "clux-mux-server"
                     })
                     .into_os_string(),
                 OsString::from("--daemonize"),

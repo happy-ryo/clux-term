@@ -1233,7 +1233,7 @@ fn run() -> anyhow::Result<()> {
         Some(sub) => sub,
         None => {
             // Need to fake an argv0
-            let mut argv = vec!["wezterm-gui".to_string()];
+            let mut argv = vec!["clux-gui".to_string()];
             for a in &config.default_gui_startup_args {
                 argv.push(a.clone());
             }

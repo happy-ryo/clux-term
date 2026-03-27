@@ -671,7 +671,7 @@ impl Reconnectable {
     /// any given shell syntax will help us provide a more meaningful
     /// message to the user.
     fn wezterm_bin_path(path: &Option<String>) -> String {
-        path.as_deref().unwrap_or("wezterm").to_string()
+        path.as_deref().unwrap_or("clux").to_string()
     }
 
     fn ssh_connect(
