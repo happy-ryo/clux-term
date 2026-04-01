@@ -19,36 +19,36 @@ fi
 
 case $OSTYPE in
   darwin*)
-    zipdir=WezTerm-macos-$TAG_NAME
+    zipdir=Clux-macos-$TAG_NAME
     if [[ "$BUILD_REASON" == "Schedule" ]] ; then
-      zipname=WezTerm-macos-nightly.zip
+      zipname=Clux-macos-nightly.zip
     else
       zipname=$zipdir.zip
     fi
     rm -rf $zipdir $zipname
     mkdir $zipdir
-    cp -r assets/macos/WezTerm.app $zipdir/
+    cp -r assets/macos/WezTerm.app $zipdir/Clux.app
     # Omit MetalANGLE for now; it's a bit laggy compared to CGL,
     # and on M1/Big Sur, CGL is implemented in terms of Metal anyway
-    rm $zipdir/WezTerm.app/*.dylib
-    mkdir -p $zipdir/WezTerm.app/Contents/MacOS
-    mkdir -p $zipdir/WezTerm.app/Contents/Resources
-    cp -r assets/shell-integration/* $zipdir/WezTerm.app/Contents/Resources
-    cp -r assets/shell-completion $zipdir/WezTerm.app/Contents/Resources
-    tic -xe wezterm -o $zipdir/WezTerm.app/Contents/Resources/terminfo termwiz/data/wezterm.terminfo
+    rm $zipdir/Clux.app/*.dylib
+    mkdir -p $zipdir/Clux.app/Contents/MacOS
+    mkdir -p $zipdir/Clux.app/Contents/Resources
+    cp -r assets/shell-integration/* $zipdir/Clux.app/Contents/Resources
+    cp -r assets/shell-completion $zipdir/Clux.app/Contents/Resources
+    tic -xe wezterm -o $zipdir/Clux.app/Contents/Resources/terminfo termwiz/data/wezterm.terminfo
 
-    for bin in wezterm wezterm-mux-server wezterm-gui strip-ansi-escapes ; do
+    for bin in clux clux-mux-server clux-gui strip-ansi-escapes ; do
       # If the user ran a simple `cargo build --release`, then we want to allow
       # a single-arch package to be built
       if [[ -f $TARGET_DIR/release/$bin ]] ; then
-        cp $TARGET_DIR/release/$bin $zipdir/WezTerm.app/Contents/MacOS/$bin
+        cp $TARGET_DIR/release/$bin $zipdir/Clux.app/Contents/MacOS/$bin
       else
         # The CI runs `cargo build --target XXX --release` which means that
         # the binaries will be deployed in `$TARGET_DIR/XXX/release` instead of
         # the plain path above.
         # In that situation, we have two architectures to assemble into a
         # Universal ("fat") binary, so we use the `lipo` tool for that.
-        lipo $TARGET_DIR/*/release/$bin -output $zipdir/WezTerm.app/Contents/MacOS/$bin -create
+        lipo $TARGET_DIR/*/release/$bin -output $zipdir/Clux.app/Contents/MacOS/$bin -create
       fi
     done
 
@@ -79,7 +79,7 @@ case $OSTYPE in
       security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MACOS_PW" build.keychain
       echo "Codesign"
       /usr/bin/codesign --keychain build.keychain --force --options runtime \
-        --entitlements ci/macos-entitlement.plist --deep --sign "$MACOS_TEAM_ID" $zipdir/WezTerm.app/
+        --entitlements ci/macos-entitlement.plist --deep --sign "$MACOS_TEAM_ID" $zipdir/Clux.app/
       echo "Restore default keychain"
       security default-keychain -d user -s $def_keychain
       echo "Remove build.keychain"
@@ -97,25 +97,25 @@ case $OSTYPE in
     set -x
 
     SHA256=$(shasum -a 256 $zipname | cut -d' ' -f1)
-    sed -e "s/@TAG@/$TAG_NAME/g" -e "s/@SHA256@/$SHA256/g" < ci/wezterm-homebrew-macos.rb.template > wezterm.rb
+    sed -e "s/@TAG@/$TAG_NAME/g" -e "s/@SHA256@/$SHA256/g" < ci/wezterm-homebrew-macos.rb.template > clux.rb
 
     ;;
   msys)
-    zipdir=WezTerm-windows-$TAG_NAME
+    zipdir=Clux-windows-$TAG_NAME
     if [[ "$BUILD_REASON" == "Schedule" ]] ; then
-      zipname=WezTerm-windows-nightly.zip
-      instname=WezTerm-nightly-setup
+      zipname=Clux-windows-nightly.zip
+      instname=Clux-nightly-setup
     else
       zipname=$zipdir.zip
-      instname=WezTerm-${TAG_NAME}-setup
+      instname=Clux-${TAG_NAME}-setup
     fi
     rm -rf $zipdir $zipname
     mkdir $zipdir
-    cp $TARGET_DIR/release/wezterm.exe \
-      $TARGET_DIR/release/wezterm-mux-server.exe \
-      $TARGET_DIR/release/wezterm-gui.exe \
+    cp $TARGET_DIR/release/clux.exe \
+      $TARGET_DIR/release/clux-mux-server.exe \
+      $TARGET_DIR/release/clux-gui.exe \
       $TARGET_DIR/release/strip-ansi-escapes.exe \
-      $TARGET_DIR/release/wezterm.pdb \
+      $TARGET_DIR/release/clux.pdb \
       assets/windows/conhost/conpty.dll \
       assets/windows/conhost/OpenConsole.exe \
       assets/windows/angle/libEGL.dll \
@@ -132,7 +132,7 @@ case $OSTYPE in
     distver=$(lsb_release -rs 2>/dev/null || sh -c "source /etc/os-release && echo \$VERSION_ID")
     case "$distro" in
       *Fedora*|*CentOS*|*SUSE*)
-        WEZTERM_RPM_VERSION=$(echo ${TAG_NAME#nightly-} | tr - _)
+        CLUX_RPM_VERSION=$(echo ${TAG_NAME#nightly-} | tr - _)
         distroid=$(sh -c "source /etc/os-release && echo \$ID" | tr - _)
         distver=$(sh -c "source /etc/os-release && echo \$VERSION_ID" | tr - _)
 
@@ -156,7 +156,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 source ~/.cargo/env
 
 cargo build --release \
-      -p wezterm-gui -p wezterm -p wezterm-mux-server \
+      -p clux-gui -p clux -p clux-mux-server \
       -p strip-ansi-escapes
 BUILDEOFEOF
 )
@@ -170,7 +170,7 @@ BuildRequires: mesa-libEGL-devel
 %if 0%{?fedora} >= 41
 BuildRequires: openssl-devel-engine
 %endif
-Source0: wezterm-${TAR_NAME}.tar.gz
+Source0: clux-${TAR_NAME}.tar.gz
 BREQEOF
 )
         else
@@ -184,52 +184,52 @@ BUILDEOFEOF
         fi
 
         # Generate single spec with subpackages
-        cat > wezterm.spec <<EOF
-Name: wezterm
-Version: ${WEZTERM_RPM_VERSION}
+        cat > clux.spec <<EOF
+Name: clux
+Version: ${CLUX_RPM_VERSION}
 Release: ${SPEC_RELEASE}
 Packager: Wez Furlong <wez@wezfurlong.org>
 License: MIT
 URL: https://wezterm.org/
-Summary: Wez's Terminal Emulator.
+Summary: Clux Terminal Emulator.
 ${BUILD_REQUIRES}
-Requires: wezterm-common, wezterm-gui, wezterm-mux-server
+Requires: clux-common, clux-gui, clux-mux-server
 
 %global debug_package %{nil}
 
 %description
-wezterm is a terminal emulator with support for modern features
+clux is a terminal emulator with support for modern features
 such as fonts with ligatures, hyperlinks, tabs and multiple
 windows.
 
-# Subpackage: wezterm-common
-%package -n wezterm-common
-Summary: Wez's Terminal Emulator - Common CLI components
+# Subpackage: clux-common
+%package -n clux-common
+Summary: Clux Terminal Emulator - Common CLI components
 Requires: openssl
-%description -n wezterm-common
-wezterm-common provides the base CLI launcher and utilities shared by
-all wezterm components.
+%description -n clux-common
+clux-common provides the base CLI launcher and utilities shared by
+all clux components.
 
-# Subpackage: wezterm-gui
-%package -n wezterm-gui
-Summary: Wez's Terminal Emulator - GUI and multiplexer
-Requires: wezterm-common
+# Subpackage: clux-gui
+%package -n clux-gui
+Summary: Clux Terminal Emulator - GUI and multiplexer
+Requires: clux-common
 %if 0%{?suse_version}
 Requires: dbus-1, fontconfig, libxcb1, libxkbcommon0, libxkbcommon-x11-0, libwayland-client0, libwayland-egl1, libwayland-cursor0, Mesa-libEGL1, libxcb-keysyms1, libxcb-ewmh2, libxcb-icccm4
 %else
 Requires: dbus, fontconfig, libxcb, libxkbcommon, libxkbcommon-x11, libwayland-client, libwayland-egl, libwayland-cursor, mesa-libEGL, xcb-util-keysyms, xcb-util-wm
 %endif
-%description -n wezterm-gui
-wezterm-gui is a GPU-accelerated cross-platform terminal emulator with
+%description -n clux-gui
+clux-gui is a GPU-accelerated cross-platform terminal emulator with
 support for modern features such as fonts with ligatures, hyperlinks,
 tabs and multiple windows.
 
-# Subpackage: wezterm-mux-server
-%package -n wezterm-mux-server
-Summary: Wez's Terminal Emulator - Multiplexer server (headless)
+# Subpackage: clux-mux-server
+%package -n clux-mux-server
+Summary: Clux Terminal Emulator - Multiplexer server (headless)
 Requires: openssl
-%description -n wezterm-mux-server
-wezterm-mux-server is a headless terminal multiplexer that can be used
+%description -n clux-mux-server
+clux-mux-server is a headless terminal multiplexer that can be used
 as a session manager for terminal sessions, without requiring X11,
 Wayland, or other GUI libraries.
 
@@ -240,9 +240,9 @@ set -x
 cd ${HERE}
 mkdir -p %{buildroot}/usr/bin %{buildroot}/etc/profile.d %{buildroot}/usr/share/icons/hicolor/128x128/apps %{buildroot}/usr/share/applications %{buildroot}/usr/share/metainfo %{buildroot}/usr/share/nautilus-python/extensions
 install -Dm755 assets/open-wezterm-here -t %{buildroot}/usr/bin
-install -Dsm755 $TARGET_DIR/release/wezterm -t %{buildroot}/usr/bin
-install -Dsm755 $TARGET_DIR/release/wezterm-gui -t %{buildroot}/usr/bin
-install -Dsm755 $TARGET_DIR/release/wezterm-mux-server -t %{buildroot}/usr/bin
+install -Dsm755 $TARGET_DIR/release/clux -t %{buildroot}/usr/bin
+install -Dsm755 $TARGET_DIR/release/clux-gui -t %{buildroot}/usr/bin
+install -Dsm755 $TARGET_DIR/release/clux-mux-server -t %{buildroot}/usr/bin
 install -Dsm755 $TARGET_DIR/release/strip-ansi-escapes -t %{buildroot}/usr/bin
 install -Dm644 assets/shell-integration/* -t %{buildroot}/etc/profile.d
 install -Dm644 assets/shell-completion/zsh %{buildroot}/usr/share/zsh/site-functions/_wezterm
@@ -255,23 +255,23 @@ install -Dm644 assets/wezterm-nautilus.py %{buildroot}/usr/share/nautilus-python
 %files
 # Main package (metapackage) has no files
 
-%files -n wezterm-common
-/usr/bin/wezterm
+%files -n clux-common
+/usr/bin/clux
 /usr/bin/strip-ansi-escapes
 /usr/share/zsh/site-functions/_wezterm
 /etc/bash_completion.d/wezterm
 /etc/profile.d/*
 
-%files -n wezterm-gui
+%files -n clux-gui
 /usr/bin/open-wezterm-here
-/usr/bin/wezterm-gui
+/usr/bin/clux-gui
 /usr/share/icons/hicolor/128x128/apps/org.wezfurlong.wezterm.png
 /usr/share/applications/org.wezfurlong.wezterm.desktop
 /usr/share/metainfo/org.wezfurlong.wezterm.appdata.xml
 /usr/share/nautilus-python/extensions/wezterm-nautilus.py*
 
-%files -n wezterm-mux-server
-/usr/bin/wezterm-mux-server
+%files -n clux-mux-server
+/usr/bin/clux-mux-server
 
 %changelog
 * Mon Oct 2 2023 Wez Furlong
@@ -279,23 +279,23 @@ install -Dm644 assets/wezterm-nautilus.py %{buildroot}/usr/share/nautilus-python
 EOF
 
         if test -n "${COPR_SRPM}" ; then
-          /usr/bin/rpmbuild -bs --rmspec wezterm.spec --verbose
-          mv $(rpm --eval '%{_srcrpmdir}')/wezterm-${TAR_NAME}*.src.rpm "${COPR_SRPM}"/
+          /usr/bin/rpmbuild -bs --rmspec clux.spec --verbose
+          mv $(rpm --eval '%{_srcrpmdir}')/clux-${TAR_NAME}*.src.rpm "${COPR_SRPM}"/
         else
-          /usr/bin/rpmbuild -bb --rmspec wezterm.spec --verbose
+          /usr/bin/rpmbuild -bb --rmspec clux.spec --verbose
         fi
 
         ;;
       Ubuntu*|Debian*|Pop)
         rm -rf pkg
-        mkdir -p pkg/debian/usr/bin pkg/debian/DEBIAN pkg/debian/usr/share/{applications,wezterm}
+        mkdir -p pkg/debian/usr/bin pkg/debian/DEBIAN pkg/debian/usr/share/{applications,clux}
 
         if [[ "$BUILD_REASON" == "Schedule" ]] ; then
-          pkgname=wezterm-nightly
-          conflicts=wezterm
+          pkgname=clux-nightly
+          conflicts=clux
         else
-          pkgname=wezterm
-          conflicts=wezterm-nightly
+          pkgname=clux
+          conflicts=clux-nightly
         fi
 
         cat > pkg/debian/control <<EOF
@@ -331,9 +331,9 @@ if [ "\$1" = "remove" ]; then
 fi
 EOF
 
-        install -Dsm755 -t pkg/debian/usr/bin $TARGET_DIR/release/wezterm-mux-server
-        install -Dsm755 -t pkg/debian/usr/bin $TARGET_DIR/release/wezterm-gui
-        install -Dsm755 -t pkg/debian/usr/bin $TARGET_DIR/release/wezterm
+        install -Dsm755 -t pkg/debian/usr/bin $TARGET_DIR/release/clux-mux-server
+        install -Dsm755 -t pkg/debian/usr/bin $TARGET_DIR/release/clux-gui
+        install -Dsm755 -t pkg/debian/usr/bin $TARGET_DIR/release/clux
         install -Dm755 -t pkg/debian/usr/bin assets/open-wezterm-here
         install -Dsm755 -t pkg/debian/usr/bin $TARGET_DIR/release/strip-ansi-escapes
 
@@ -356,9 +356,9 @@ EOF
         install -Dm644 assets/shell-integration/* -t pkg/debian/etc/profile.d
 
         if [[ "$BUILD_REASON" == "Schedule" ]] ; then
-          debname=wezterm-nightly.$distro$distver
+          debname=clux-nightly.$distro$distver
         else
-          debname=wezterm-$TAG_NAME.$distro$distver
+          debname=clux-$TAG_NAME.$distro$distver
         fi
         arch=$(dpkg-architecture -q DEB_BUILD_ARCH_CPU)
         case $arch in
@@ -375,8 +375,8 @@ EOF
           $SUDO apt-get install ./$debname.deb
         fi
 
-        mv pkg/debian pkg/wezterm
-        tar cJf $debname.tar.xz -C pkg wezterm
+        mv pkg/debian pkg/clux
+        tar cJf $debname.tar.xz -C pkg clux
         rm -rf pkg
       ;;
     esac
@@ -389,7 +389,7 @@ EOF
         pkgver="${TAG_NAME#nightly-}"
         cat > APKBUILD <<EOF
 # Maintainer: Wez Furlong <wez@wezfurlong.org>
-pkgname=wezterm
+pkgname=clux
 pkgver=$(echo "$pkgver" | cut -d'-' -f1-2 | tr - .)
 _pkgver=$pkgver
 pkgrel=0
@@ -400,9 +400,9 @@ options="!check"
 url="https://wezterm.org/"
 makedepends="cmd:tic"
 source="
-  $TARGET_DIR/release/wezterm
-  $TARGET_DIR/release/wezterm-gui
-  $TARGET_DIR/release/wezterm-mux-server
+  $TARGET_DIR/release/clux
+  $TARGET_DIR/release/clux-gui
+  $TARGET_DIR/release/clux-mux-server
   assets/open-wezterm-here
   assets/wezterm.desktop
   assets/wezterm.appdata.xml
@@ -418,9 +418,9 @@ build() {
 
 package() {
   install -Dm755 -t "\$pkgdir"/usr/bin "\$srcdir"/open-wezterm-here
-  install -Dm755 -t "\$pkgdir"/usr/bin "\$srcdir"/wezterm
-  install -Dm755 -t "\$pkgdir"/usr/bin "\$srcdir"/wezterm-gui
-  install -Dm755 -t "\$pkgdir"/usr/bin "\$srcdir"/wezterm-mux-server
+  install -Dm755 -t "\$pkgdir"/usr/bin "\$srcdir"/clux
+  install -Dm755 -t "\$pkgdir"/usr/bin "\$srcdir"/clux-gui
+  install -Dm755 -t "\$pkgdir"/usr/bin "\$srcdir"/clux-mux-server
 
   install -Dm644 -t "\$pkgdir"/usr/share/applications "\$srcdir"/wezterm.desktop
   install -Dm644 -t "\$pkgdir"/usr/share/metainfo "\$srcdir"/wezterm.appdata.xml

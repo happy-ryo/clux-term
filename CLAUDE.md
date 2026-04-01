@@ -31,9 +31,6 @@ cargo test -p wezterm-term -- test_function_name
 cargo +nightly fmt --all -- --check    # チェックのみ
 cargo +nightly fmt --all               # 自動修正
 
-# Lint
-cargo clippy --workspace --all-targets -- -D warnings
-
 # ライセンス/セキュリティ監査
 cargo deny check
 
@@ -60,8 +57,8 @@ cargo deny check
 | `/done` | 後片付け (マージ確認→ブランチ削除→次Issue提案) |
 | `/resume` | 中断した作業の再開 (状態推定→タスク復元→次ステップ案内) |
 | `/status` | プロジェクト進捗表示 (Milestone進捗→Issue→PR状態) |
-| `/ci` | 全CIチェック実行 (fmt→clippy→test→build→deny) |
-| `/lint` | clippy + fmt + deny チェック |
+| `/ci` | 全CIチェック実行 (fmt→test→build→deny) |
+| `/lint` | fmt + deny チェック |
 | `/build` | cargo build |
 | `/test` | cargo test |
 
@@ -75,7 +72,7 @@ cargo deny check
 
 ### Git Hooks
 
-- `scripts/pre-commit`: コミット前にfmt + clippy + build を自動実行
+- `scripts/pre-commit`: コミット前にfmt + build を自動実行
 - hooks設定: `git config core.hooksPath scripts`
 
 ### Branch Naming
@@ -131,6 +128,5 @@ PTY → `mux::Pane` (localpane.rs) → `TermWindow::paint()` → HarfBuzz text s
 ## CI
 
 - rustfmt -- `cargo +nightly fmt --all -- --check` (`.github/workflows/fmt.yml`)
-- clippy -- `cargo clippy --workspace --all-targets -- -D warnings`
 - cargo-deny -- ライセンス/セキュリティ監査 (`deny.toml`)
 - プラットフォーム別ビルド+テスト (`.github/workflows/gen_*.yml`)
