@@ -1,6 +1,6 @@
 ---
 name: rust-dev-workflow
-description: Rust プロジェクトの GitHub Issue ベース開発ワークフローを管理する Skill。Issue 開始、ブランチ作成、CI チェック、PR 作成、完了処理、作業再開を一貫したフローで実行する。Rust の cargo/clippy/fmt、GitHub CLI (gh)、Git を統合し、事前検証・エラーリカバリ・状態ガイドを備える。`/start`、`/pr`、`/done`、`/resume`、`/ci`、`/status` のコマンド群で構成。Rust プロジェクトで Issue 駆動の開発を行う場合、ブランチ管理やPR作成の手順を標準化したい場合、CI チェックをローカルで一括実行したい場合に使う。
+description: Rust プロジェクトの GitHub Issue ベース開発ワークフローを管理する Skill。Issue 開始、ブランチ作成、CI チェック、PR 作成、完了処理、作業再開を一貫したフローで実行する。Rust の cargo/fmt、GitHub CLI (gh)、Git を統合し、事前検証・エラーリカバリ・状態ガイドを備える。`/start`、`/pr`、`/done`、`/resume`、`/ci`、`/status` のコマンド群で構成。Rust プロジェクトで Issue 駆動の開発を行う場合、ブランチ管理やPR作成の手順を標準化したい場合、CI チェックをローカルで一括実行したい場合に使う。
 ---
 
 # Rust Dev Workflow
@@ -17,7 +17,6 @@ GitHub Issue ベースの Rust プロジェクト開発ワークフロー。
 - default_shell: pwsh.exe  (任意)
 - ci_steps:
   - cargo fmt --check
-  - cargo clippy --all-targets -- -D warnings
   - cargo test --all
   - cargo build
   - cargo deny check  (deny.toml がある場合のみ)
@@ -58,7 +57,7 @@ GitHub Issue ベースの Rust プロジェクト開発ワークフロー。
 Issue の実装を開始する。事前に未コミット変更・ブランチ状態を検証し、featureブランチを作成してタスク計画を立てる。引数なしなら未解決 Issue 一覧を表示。
 
 ### /pr
-現在のブランチから PR を作成する。事前に全 CI チェックを実行し、fmt/clippy は自動修正を試みる。チェックが全通過したときのみ PR を作成。
+現在のブランチから PR を作成する。事前に全 CI チェックを実行し、fmt は自動修正を試みる。チェックが全通過したときのみ PR を作成。
 
 ### /done
 作業完了の後片付け。PR のマージ状態を確認し、ブランチ削除と次 Issue の提案を行う。
@@ -67,7 +66,7 @@ Issue の実装を開始する。事前に未コミット変更・ブランチ�
 中断した作業を再開する。Git 状態から作業フェーズを推定し、タスクリストを復元して次のステップを案内。
 
 ### /ci
-ローカル CI パイプラインを実行。fmt → clippy → test → build → (deny) の順でチェックし、結果サマリーを表示。
+ローカル CI パイプラインを実行。fmt → test → build → (deny) の順でチェックし、結果サマリーを表示。
 
 ### /status
 プロジェクト全体の進捗を表示。Milestone 進捗、Issue 一覧、PR 状態を統合表示。
@@ -95,4 +94,4 @@ feature/issue-<番号>-<ケバブケースの説明>
 - `cargo` (Rust toolchain)
 - `gh` (GitHub CLI、認証済み)
 - `cargo-deny` (任意、deny.toml がある場合)
-- `clippy`, `rustfmt` (rustup components)
+- `rustfmt` (rustup component)

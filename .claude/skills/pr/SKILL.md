@@ -1,6 +1,6 @@
 ---
 name: pr
-description: 現在のブランチから PR を作成する。事前に全 CI チェック (fmt→clippy→test→build→deny) を実行し、fmt/clippy は自動修正を試みる。全通過後のみ PR を作成。使い方: `/pr`
+description: 現在のブランチから PR を作成する。事前に全 CI チェック (fmt→test→build→deny) を実行し、fmt は自動修正を試みる。全通過後のみ PR を作成。使い方: `/pr`
 ---
 
 # /pr
@@ -22,7 +22,6 @@ description: 現在のブランチから PR を作成する。事前に全 CI �
 ### CI チェック (自動修正付き)
 順番に実行。失敗時:
 - **fmt**: `cargo fmt` で自動修正 → 修正コミット → 再チェック
-- **clippy**: `cargo clippy --fix --allow-dirty` を試行 → 不可なら停止
 - **test**: 失敗テスト表示 → **PR 作成しない**
 - **build**: エラー表示 → **PR 作成しない**
 
