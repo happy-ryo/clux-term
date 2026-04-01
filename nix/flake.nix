@@ -99,7 +99,7 @@
         packages.default = rustPlatform.buildRustPackage rec {
           inherit buildInputs nativeBuildInputs;
 
-          name = "wezterm";
+          name = "clux";
           src = ./..;
           version = self.shortRev or "dev";
 
@@ -139,19 +139,19 @@
               patchelf \
                 --add-needed "${pkgs.libGL}/lib/libEGL.so.1" \
                 --add-needed "${pkgs.vulkan-loader}/lib/libvulkan.so.1" \
-                $out/bin/wezterm-gui
+                $out/bin/clux-gui
             ''
             + lib.optionalString stdenv.isDarwin /* bash */ ''
               mkdir -p "$out/Applications"
-              OUT_APP="$out/Applications/WezTerm.app"
+              OUT_APP="$out/Applications/Clux.app"
               cp -r assets/macos/WezTerm.app "$OUT_APP"
               rm $OUT_APP/*.dylib
               cp -r assets/shell-integration/* "$OUT_APP"
               # macOS will only recognize our application bundle
               # if the binaries are inside of it. Move them there
               # and create symbolic links for them in bin/.
-              mv $out/bin/{wezterm,wezterm-mux-server,wezterm-gui,strip-ansi-escapes} "$OUT_APP"
-              ln -s "$OUT_APP"/{wezterm,wezterm-mux-server,wezterm-gui,strip-ansi-escapes} "$out/bin"
+              mv $out/bin/{clux,clux-mux-server,clux-gui,strip-ansi-escapes} "$OUT_APP"
+              ln -s "$OUT_APP"/{clux,clux-mux-server,clux-gui,strip-ansi-escapes} "$out/bin"
             '';
 
           postInstall = ''
@@ -163,7 +163,7 @@
             install -Dm644 assets/wezterm.appdata.xml $out/share/metainfo/org.wezfurlong.wezterm.appdata.xml
 
             install -Dm644 assets/shell-integration/wezterm.sh -t $out/etc/profile.d
-            installShellCompletion --cmd wezterm \
+            installShellCompletion --cmd clux \
               --bash assets/shell-completion/bash \
               --fish assets/shell-completion/fish \
               --zsh assets/shell-completion/zsh
@@ -174,7 +174,7 @@
           passthru = {
             # the headless variant is useful when deploying wezterm's mux server on remote severs
             headless = rustPlatform.buildRustPackage {
-              pname = "wezterm-headless";
+              pname = "clux-headless";
               inherit
                 version
                 src
@@ -189,9 +189,9 @@
 
               cargoBuildFlags = [
                 "--package"
-                "wezterm"
+                "clux"
                 "--package"
-                "wezterm-mux-server"
+                "clux-mux-server"
               ];
 
               doCheck = false;
@@ -213,11 +213,11 @@
                 '';
           };
 
-          meta.mainProgram = "wezterm";
+          meta.mainProgram = "clux";
         };
 
         devShell = pkgs.mkShell {
-          name = "wezterm-shell";
+          name = "clux-shell";
           inherit nativeBuildInputs;
 
           buildInputs =
