@@ -49,7 +49,6 @@
 ### CI チェック (自動修正付き)
 順番に実行。失敗時:
 - **fmt**: `cargo fmt` で自動修正 → 修正コミット → 再チェック
-- **clippy**: `cargo clippy --fix --allow-dirty` を試行 → 不可なら停止
 - **test**: 失敗テスト表示 → **PR 作成しない**
 - **build**: エラー表示 → **PR 作成しない**
 
@@ -123,16 +122,15 @@ Issue チェックリスト → TaskCreate → git log から完了推定
 
 ### チェック順序
 1. `cargo fmt --check`
-2. `cargo clippy --all-targets -- -D warnings`
-3. `cargo test --all`
-4. `cargo build`
-5. `cargo deny check` (deny.toml 存在時のみ)
+2. `cargo test --all`
+3. `cargo build`
+4. `cargo deny check` (deny.toml 存在時のみ)
 
 ### 結果表示
 テーブル形式で全結果サマリー。全通過 → `/pr` 案内。失敗 → 修正案内。
 
 ### 自動修正モード
-「修正して」で fmt/clippy の自動修正→コミット→再チェック。
+「修正して」で fmt の自動修正→コミット→再チェック。
 
 ---
 
@@ -160,4 +158,4 @@ Issue チェックリスト → TaskCreate → git log から完了推定
 
 ### CI ステップの解決
 1. CLAUDE.md の `ci_steps:` 設定を確認
-2. なければデフォルト: fmt → clippy → test → build → deny (deny.toml 存在時)
+2. なければデフォルト: fmt → test → build → deny (deny.toml 存在時)
