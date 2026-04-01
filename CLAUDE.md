@@ -1,4 +1,6 @@
-# clux - Development Guide
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project
 
@@ -6,6 +8,38 @@ WezTermベースのAIエージェント協調型ターミナルマルチプレ�
 
 - リポジトリ: https://github.com/happy-ryo/clux-term
 - 上流: https://github.com/wezterm/wezterm
+
+clux adds Claude Code coordination features via an embedded MCP server on top of WezTerm's terminal emulation, font rendering, and multiplexer functionality.
+
+## Build & Test Commands
+
+```bash
+# ビルド
+cargo build
+
+# テスト (全体)
+cargo test --workspace
+
+# テスト (単一クレート)
+cargo test -p wezterm-term
+cargo test -p termwiz
+
+# テスト (単一テスト関数)
+cargo test -p wezterm-term -- test_function_name
+
+# フォーマット (nightly toolchain 必須)
+cargo +nightly fmt --all -- --check    # チェックのみ
+cargo +nightly fmt --all               # 自動修正
+
+# Lint
+cargo clippy --workspace --all-targets -- -D warnings
+
+# ライセンス/セキュリティ監査
+cargo deny check
+
+# 全CIチェック一括 (スラッシュコマンド)
+/ci
+```
 
 ## Development Workflow
 
@@ -54,13 +88,45 @@ WezTermベースのAIエージェント協調型ターミナルマルチプレ�
 - `Closes #<番号>` でIssue自動クローズ
 - `Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>`
 
-## Tech Stack
+## Architecture
 
-- Rust (edition 2021)
-- WezTerm (GPU-accelerated terminal emulator)
-- termwiz (terminal primitives, escape sequence handling)
-- FreeType / HarfBuzz / fontconfig (font rendering & shaping)
-- OpenGL (GPU rendering)
+### レイヤー構成
+
+```
+┌─────────────────────────────────────────────────┐
+│  Entry Points                                    │
+│  wezterm/ (CLI)  wezterm-gui/  wezterm-mux-server/ │
+├─────────────────────────────────────────────────┤
+│  Rendering: window/ (X11/Wayland/macOS/WGPU)    │
+│  wezterm-font/ (FreeType/HarfBuzz glyph shaping)│
+├─────────────────────────────────────────────────┤
+│  Configuration: config/ (Lua 5.4 via mlua)       │
+│  lua-api-crates/ (Rust→Lua API バインディング群)    │
+├─────────────────────────────────────────────────┤
+│  Multiplexer: mux/ (Pane/Tab/Window/Domain管理)  │
+│  portable-pty (PTYプロセス管理)                    │
+├─────────────────────────────────────────────────┤
+│  Terminal Core: term/ (VTEパーサー, セルグリッド)   │
+│  termwiz/ (エスケープシーケンス, ターミナルプリミティブ) │
+└─────────────────────────────────────────────────┘
+```
+
+### レンダリングパイプライン
+
+PTY → `mux::Pane` (localpane.rs) → `TermWindow::paint()` → HarfBuzz text shaping → GlyphCache (テクスチャアトラス) → WGPU/GL シェーダー → 画面
+
+### 主要クレート間の依存
+
+- `wezterm-gui` → `window`, `mux`, `config`, `wezterm-font`
+- `mux` → `term`, `config`, `portable-pty`
+- `config` → `mlua` (Lua 5.4), `wezterm-dynamic` (Lua⇔Rust型変換)
+- `term` → `termwiz`, `wezterm-cell`, `wezterm-escape-parser`
+
+### Lua設定システム
+
+- 起動時に `wezterm.lua` をロード (`config::configuration()`)
+- `lua-api-crates/` 配下の各クレートがRust関数をLuaに公開 (mux-lua, window-funcs, spawn-funcs 等)
+- `wezterm-dynamic` クレートによるLua→Rust型マーシャリング
 
 ## CI
 
@@ -68,23 +134,3 @@ WezTermベースのAIエージェント協調型ターミナルマルチプレ�
 - clippy -- `cargo clippy --workspace --all-targets -- -D warnings`
 - cargo-deny -- ライセンス/セキュリティ監査 (`deny.toml`)
 - プラットフォーム別ビルド+テスト (`.github/workflows/gen_*.yml`)
-
-## Workspace Structure
-
-```
-wezterm/                # メインバイナリ (CLI)
-wezterm-gui/            # GUIフロントエンド
-wezterm-mux-server/     # マルチプレクササーバー
-wezterm-ssh/            # SSH実装
-wezterm-surface/        # サーフェス抽象化
-wezterm-cell/           # セル・テキスト表現
-wezterm-escape-parser/  # エスケープシーケンスパーサー
-wezterm-dynamic/        # 動的型付け
-wezterm-blob-leases/    # BLOBリース管理
-wezterm-open-url/       # URL処理
-wezterm-uds/            # Unixドメインソケット
-strip-ansi-escapes/     # ANSIエスケープ除去
-sync-color-schemes/     # カラースキーム同期
-bidi/                   # 双方向テキスト処理
-deps/cairo/             # Cairo描画バインディング
-```
