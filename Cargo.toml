@@ -1,5 +1,6 @@
 [workspace]
 members = [
+  "crates/clux-coord",
   "bidi",
   "bidi/generate",
   "strip-ansi-escapes",
