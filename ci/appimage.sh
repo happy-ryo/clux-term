@@ -16,6 +16,7 @@ install -Dm644 assets/wezterm-nautilus.py AppDir/usr/share/nautilus-python/exten
 
 [ -x /tmp/linuxdeploy ] || ( curl -L 'https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage' -o /tmp/linuxdeploy && chmod +x /tmp/linuxdeploy )
 
+git config --global --add safe.directory '*'
 TAG_NAME=${TAG_NAME:-$(git -c "core.abbrev=8" show -s "--format=%cd-%h" "--date=format:%Y%m%d-%H%M%S")}
 distro=$(lsb_release -is 2>/dev/null || sh -c "source /etc/os-release && echo \$NAME")
 distver=$(lsb_release -rs 2>/dev/null || sh -c "source /etc/os-release && echo \$VERSION_ID")

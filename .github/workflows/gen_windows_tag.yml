@@ -76,8 +76,8 @@ jobs:
         with:
           name: "windows"
           path: |
-            WezTerm-*.zip
-            WezTerm-*.exe
+            Clux-*.zip
+            Clux-*.exe
 
   upload:
     runs-on: ubuntu-latest
@@ -97,7 +97,7 @@ jobs:
           name: "windows"
       - name: "Checksum"
         shell: bash
-        run: "for f in WezTerm-*.zip WezTerm-*.exe ; do sha256sum $f > $f.sha256 ; done"
+        run: "for f in Clux-*.zip Clux-*.exe ; do sha256sum $f > $f.sha256 ; done"
       - name: "Create pre-release"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -107,7 +107,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
-        run: "bash ci/retry.sh gh release upload --clobber $(ci/tag-name.sh) WezTerm-*.zip WezTerm-*.exe *.sha256"
+        run: "bash ci/retry.sh gh release upload --clobber $(ci/tag-name.sh) Clux-*.zip Clux-*.exe *.sha256"
       - name: "Checkout winget-pkgs"
         uses: actions/checkout@v4
         with:
@@ -122,7 +122,7 @@ jobs:
         run: "cd winget-pkgs && git config user.name 'Wez Furlong'"
       - name: "Create winget manifest and push to fork"
         shell: bash
-        run: "bash ci/make-winget-pr.sh winget-pkgs WezTerm-*.exe"
+        run: "bash ci/make-winget-pr.sh winget-pkgs Clux-*.exe"
       - name: "Submit PR"
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}

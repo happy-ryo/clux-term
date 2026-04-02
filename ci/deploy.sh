@@ -4,6 +4,10 @@ set -e
 
 TARGET_DIR=${1:-target}
 
+# Allow git operations in Docker containers where the repo owner differs
+# from the current user (e.g., GitHub Actions runners)
+git config --global --add safe.directory '*'
+
 TAG_NAME=${TAG_NAME:-$(git -c "core.abbrev=8" show -s "--format=%cd-%h" "--date=format:%Y%m%d-%H%M%S")}
 
 HERE=$(pwd)
