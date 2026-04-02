@@ -1,0 +1,2 @@
+# clux-coord-server uses only the Python standard library.
+# No external dependencies required.
