@@ -88,7 +88,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: "macos"
-          path: "WezTerm-*.zip"
+          path: "Clux-*.zip"
 
   upload:
     runs-on: ubuntu-latest
@@ -122,7 +122,7 @@ jobs:
           name: "macos"
       - name: "Checksum"
         shell: bash
-        run: "for f in WezTerm-*.zip ; do sha256sum $f > $f.sha256 ; done"
+        run: "for f in Clux-*.zip ; do sha256sum $f > $f.sha256 ; done"
       - name: "Create pre-release"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -132,4 +132,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
-        run: "bash ci/retry.sh gh release upload --clobber $(ci/tag-name.sh) WezTerm-*.zip *.sha256"
+        run: "bash ci/retry.sh gh release upload --clobber $(ci/tag-name.sh) Clux-*.zip *.sha256"
