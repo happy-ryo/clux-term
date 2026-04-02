@@ -9,5 +9,9 @@ serde_json = "1"
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "net"] }
 axum = "0.8"
 
+[[bin]]
+name = "clux-coord-server"
+path = "src/main.rs"
+
 [dev-dependencies]
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "test-util"] }
